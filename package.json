@@ -1,0 +1,14 @@
+{
+  "name": "oad",
+
+  "scripts":
+  {
+    "test": "ts-node -r console-ultimate ."
+  },
+
+  "dependencies":
+  {
+    "ts-node": "10",
+    "console-ultimate": "3"
+  }
+}
