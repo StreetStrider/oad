@@ -89,3 +89,25 @@ export function Seq <Out extends any[]> (...matchers: { [Index in keyof Out]: $M
 		return Matched(next_reader, R as Out)
 	}
 }
+
+type Union <Tuple extends any[]> = Tuple[number]
+
+export function OneOf <Out extends any[]> (...matchers: { [Index in keyof Out]: $Matcher<Out[Index]> }): $Matcher<Union<Out>>
+{
+	return (reader) =>
+	{
+		var P
+
+		for (var matcher of matchers)
+		{
+			P = matcher(reader)
+
+			if (! P.is_nothing)
+			{
+				return P
+			}
+		}
+
+		return Nothing(reader)
+	}
+}
