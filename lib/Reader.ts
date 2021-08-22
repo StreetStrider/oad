@@ -23,20 +23,22 @@ export default function Reader (source: string, pin: number = 0): $Reader
 		return [ Reader(source, offset), source.slice(pin, offset) ]
 	}
 
+	/*
 	function is_end ()
 	{
 		return (pin === pin_end)
 	}
+	*/
 
 	function repr ()
 	{
-		var [ pre, char, pos ] = [ source.slice(0, pin), source.slice(pin, pin + 1), source.slice(pin + 1) ]
+		var [ prep, char, post ] = [ source.slice(0, pin), source.slice(pin, pin + 1), source.slice(pin + 1) ]
 
-		pre  = replace_control(pre)
+		prep  = replace_control(prep)
 		char = replace_control(char)
-		pos  = replace_control(pos)
+		post  = replace_control(post)
 
-		return `(${ pin }): ${ pre }\x1b[4;7m${ char || ' ' }\x1b[0m${ pos }`
+		return `(${ pin }): ${ prep }\x1b[4;7m${ char || '∅' }\x1b[0m${ post }`
 	}
 
 	var reader =
@@ -44,7 +46,7 @@ export default function Reader (source: string, pin: number = 0): $Reader
 		source,
 		pin,
 		read,
-		is_end,
+		// is_end,
 		repr,
 	}
 

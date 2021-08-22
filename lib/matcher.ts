@@ -131,6 +131,55 @@ export function OneOf <Out extends any[]> (...matchers: { [Index in keyof Out]: 
 	}
 }
 
+export function Repeat <T, R = null> (element: $Matcher<T>, separator?: $Matcher<R>): $Matcher<[ T, R ][]>
+{
+	return (reader) =>
+	{
+		var next_reader = reader
+		var R = ([] as ([ T, R ][]))
+
+		for (;;)
+		{
+			var P = element(next_reader)
+
+			if (P.is_nothing) break
+
+			next_reader = P.reader
+
+			if (separator)
+			{
+				var P_sep = separator(next_reader)
+
+				if (! P_sep.is_nothing)
+				{
+					R.push([ P.match, P_sep.match ])
+
+					next_reader = P_sep.reader
+				}
+				else
+				{
+					R.push([ P.match, null as unknown as R ])
+					break
+				}
+			}
+			else
+			{
+				R.push([ P.match, null as unknown as R ])
+			}
+		}
+
+		if (! R.length)
+		{
+			return Nothing(reader)
+		}
+		else
+		{
+			return Matched(next_reader, R)
+		}
+	}
+}
+
+
 type $Portal <T = string> = $Matcher<T> & { onto: $Matcher<T> | null }
 
 export function Portal <T> (): $Portal<T>
