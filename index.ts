@@ -12,6 +12,7 @@ import { Optional } from './lib/matcher'
 import { Seq } from './lib/matcher'
 import { OneOf } from './lib/matcher'
 import { Repeat } from './lib/matcher'
+import { Total } from './lib/matcher'
 import { Portal } from './lib/matcher'
 
 var plus = Literal('+')
@@ -33,7 +34,7 @@ var expr = OneOf(
 	number,
 )
 
-var program = Repeat(Spaced(expr), sep)
+var program = Total(Repeat(Spaced(expr), sep))
 
 expr_portal.onto = expr
 

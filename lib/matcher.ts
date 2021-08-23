@@ -82,7 +82,7 @@ export function Optional <T = string> (matcher: $Matcher<T>): $Matcher<T | null>
 	}
 }
 
-export function Seq <Out extends any[]> (...matchers: { [Index in keyof Out]: $Matcher<Out[Index]> }): $Matcher<Out>
+export function Seq <Out extends any[] = string[]> (...matchers: { [Index in keyof Out]: $Matcher<Out[Index]> }): $Matcher<Out>
 {
 	return (reader) =>
 	{
@@ -110,7 +110,7 @@ export function Seq <Out extends any[]> (...matchers: { [Index in keyof Out]: $M
 
 type Union <Tuple extends any[]> = Tuple[number]
 
-export function OneOf <Out extends any[]> (...matchers: { [Index in keyof Out]: $Matcher<Out[Index]> }): $Matcher<Union<Out>>
+export function OneOf <Out extends any[] = string[]> (...matchers: { [Index in keyof Out]: $Matcher<Out[Index]> }): $Matcher<Union<Out>>
 {
 	return (reader) =>
 	{
@@ -131,7 +131,7 @@ export function OneOf <Out extends any[]> (...matchers: { [Index in keyof Out]: 
 	}
 }
 
-export function Repeat <T, R = null> (element: $Matcher<T>, separator?: $Matcher<R>): $Matcher<[ T, R ][]>
+export function Repeat <T = string, R = null> (element: $Matcher<T>, separator?: $Matcher<R>): $Matcher<[ T, R ][]>
 {
 	return (reader) =>
 	{
@@ -179,6 +179,21 @@ export function Repeat <T, R = null> (element: $Matcher<T>, separator?: $Matcher
 	}
 }
 
+export function Total <T = string> (matcher: $Matcher<T>): $Matcher<T>
+{
+	return (reader) =>
+	{
+		var P = matcher(reader)
+
+		if (P.is_nothing) return P
+
+		var next_reader = P.reader
+
+		if (next_reader.read()) return Nothing(reader)
+
+		return P
+	}
+}
 
 type $Portal <T = string> = $Matcher<T> & { onto: $Matcher<T> | null }
 
