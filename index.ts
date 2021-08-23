@@ -21,6 +21,11 @@ import { Translate } from './lib/decorate'
 import { Tokenize } from './lib/decorate'
 import { Literize } from './lib/decorate'
 
+import { traverse } from './lib/traverse'
+// import { Reduce } from './lib/traverse'
+import { trim } from './lib/traverse'
+import { flatten } from './lib/traverse'
+
 var space = Charclass('\\s')
 var plus = pipe.now(Literal('+'), Literize('@plus'))
 var number = pipe.now(Charclass('\\d'), Translate(Number), Tokenize('@number'))
@@ -52,3 +57,16 @@ var P = program(r)
 
 console.info(P.reader.repr())
 console.dir(P.repr(), { depth: Infinity })
+
+if (! P.is_nothing)
+{
+	// var t = traverse(P.match, mapper)
+	var t = traverse(P.match, pipe(trim(), flatten()))
+	console.dir(t, { depth: Infinity })
+}
+
+function mapper (match: any)
+{
+	console.warn(match)
+	return match
+}
