@@ -52,11 +52,7 @@ export function Charclass (charclass: string): $Matcher
 	}
 }
 
-export function Num ()
-{
-	return Charclass('\\d')
-}
-
+/*
 export function Line (): $Matcher
 {
 	return (reader) =>
@@ -64,6 +60,7 @@ export function Line (): $Matcher
 		return read_until(reader, next => (next === '\n'))
 	}
 }
+*/
 
 export function Optional <T = string> (matcher: $Matcher<T>): $Matcher<T | null>
 {

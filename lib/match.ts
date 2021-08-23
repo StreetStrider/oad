@@ -13,6 +13,7 @@ export interface $Matched <T = string>
 	map (fn: (input: T) => $Nothing): $Nothing,
 	map <R> (fn: (input: T) => R | $Nothing): $Matched<R> | $Nothing,
 	map <R> (fn: (input: T) => R): $Matched<R>,
+	repr (): T,
 }
 
 export function Matched <T = string> (reader: $Reader, match: T): $Matched<T>
@@ -32,6 +33,10 @@ export function Matched <T = string> (reader: $Reader, match: T): $Matched<T>
 
 			return Matched(reader, pr)
 		},
+		repr ()
+		{
+			return match
+		},
 	}
 }
 
@@ -41,6 +46,7 @@ export interface $Nothing
 	is_nothing: true,
 	reader: $Reader,
 	map (fn: (input: any) => any): $Nothing,
+	repr (): { is_nothing: true },
 }
 
 export function Nothing (reader: $Reader): $Nothing
@@ -51,6 +57,10 @@ export function Nothing (reader: $Reader): $Nothing
 		map (fn: any): $Nothing
 		{
 			return Nothing(reader)
-		}
+		},
+		repr ()
+		{
+			return { is_nothing: true }
+		},
 	}
 }

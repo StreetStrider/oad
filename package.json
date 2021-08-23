@@ -9,6 +9,8 @@
   "dependencies":
   {
     "ts-node": "10",
-    "console-ultimate": "3"
+    "console-ultimate": "3",
+    "def-prop": "2",
+    "@arrows/composition": "1.2"
   }
 }
