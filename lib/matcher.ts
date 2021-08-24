@@ -16,9 +16,8 @@ export function Literal (literal: string): $Matcher
 {
 	return (reader) =>
 	{
-		var pr = read(reader, literal.length)
-
-		return pr.map(matched =>
+		return read(reader, literal.length)
+		.map(matched =>
 		{
 			if (matched === literal)
 			{
@@ -26,7 +25,7 @@ export function Literal (literal: string): $Matcher
 			}
 			else
 			{
-				return Nothing(reader)
+				return Nothing(reader, { message: 'Literal: does not match literal' })
 			}
 		})
 	}
@@ -37,8 +36,9 @@ export function Charclass (charclass: string): $Matcher
 	return (reader) =>
 	{
 		var regexp = new RegExp(`^${ charclass }$`)
-		var P = read_while(reader, (next) => regexp.test(next))
-		return P.map(matched =>
+
+		return read_while(reader, (next) => regexp.test(next))
+		.map(matched =>
 		{
 			if (matched.length)
 			{
@@ -46,21 +46,11 @@ export function Charclass (charclass: string): $Matcher
 			}
 			else
 			{
-				return Nothing(reader)
+				return Nothing(reader, { message: 'Charclass: does not match character class' })
 			}
 		})
 	}
 }
-
-/*
-export function Line (): $Matcher
-{
-	return (reader) =>
-	{
-		return read_until(reader, next => (next === '\n'))
-	}
-}
-*/
 
 export function Optional <T = string> (matcher: $Matcher<T>): $Matcher<T | null>
 {
@@ -87,14 +77,19 @@ export function Seq <Out extends any[] = string[]> (...matchers: { [Index in key
 		var P
 		var R = []
 
-		for (var [ matcher, index1 ] of enumerate(matchers, 1))
+		for (var [ matcher, nth ] of enumerate(matchers, 1))
 		{
 			P = matcher(next_reader)
 
 			if (P.is_nothing)
 			{
-				console.warn('Seq', index1, matcher)
-				return Nothing(reader)
+				return Nothing(next_reader,
+				{
+					message: 'Seq: cannot parse nth matcher',
+					nth,
+					matcher,
+					cause: P,
+				})
 			}
 
 			next_reader = P.reader
@@ -119,12 +114,15 @@ export function OneOf <Out extends any[] = string[]> (...matchers: { [Index in k
 
 			if (! P.is_nothing)
 			{
-				console.warn('OneOf', index1, matcher)
 				return P
 			}
 		}
 
-		return Nothing(reader)
+		return Nothing(reader,
+		{
+			message: 'OneOf: no alternatives at',
+			cause: P,
+		})
 	}
 }
 
@@ -167,7 +165,7 @@ export function Repeat <T = string, R = null> (element: $Matcher<T>, separator?:
 
 		if (! R.length)
 		{
-			return Nothing(reader)
+			return Nothing(next_reader)
 		}
 		else
 		{
@@ -186,7 +184,10 @@ export function Total <T = string> (matcher: $Matcher<T>): $Matcher<T>
 
 		var next_reader = P.reader
 
-		if (next_reader.read()) return Nothing(reader)
+		if (next_reader.read()) return Nothing(next_reader,
+		{
+			message: 'Total: unconsumed content at',
+		})
 
 		return P
 	}

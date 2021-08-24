@@ -41,26 +41,28 @@ export function Matched <T = string> (reader: $Reader, match: T): $Matched<T>
 }
 
 
-export interface $Nothing
+export interface $Nothing <T = any>
 {
 	is_nothing: true,
 	reader: $Reader,
+	meta: T | null,
 	map (fn: (input: any) => any): $Nothing,
 	repr (): { is_nothing: true },
 }
 
-export function Nothing (reader: $Reader): $Nothing
+export function Nothing <T = any> (reader: $Reader, meta: T | null = null): $Nothing<T>
 {
 	return {
 		is_nothing: true,
 		reader,
+		meta,
 		map (fn: any): $Nothing
 		{
 			return Nothing(reader)
 		},
 		repr ()
 		{
-			return { is_nothing: true }
+			return { is_nothing: true, meta }
 		},
 	}
 }

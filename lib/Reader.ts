@@ -31,7 +31,7 @@ export default function Reader (source: string, pin: number = 0): $Reader
 		char = replace_control(char)
 		post  = replace_control(post)
 
-		return `(${ pin },${ pin_end }): ${ prep }\x1b[4;7m${ char || '∅' }\x1b[0m${ post }`
+		return `(${ pin },${ pin_end }): ${ prep }\x1b[4;7m${ char || '∅' }\x1b[24;27m${ post }`
 	}
 
 	var reader =

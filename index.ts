@@ -51,7 +51,7 @@ var program = Total(Repeat(Spaced(expr), sep))
 expr_portal.onto = expr
 
 // var r = Reader(`123  +   345`)
-var r = Reader(`123  +   345 ; 100   +100;`)
+var r = Reader(`123  + / 345 ; 100   +100;`)
 
 var P = program(r)
 
