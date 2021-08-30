@@ -31,6 +31,27 @@ export function Literal (literal: string): $Matcher
 	}
 }
 
+export function Char (charclass: string): $Matcher
+{
+	return (reader) =>
+	{
+		var regexp = new RegExp(`^${ charclass }$`)
+
+		return read(reader)
+		.map(char =>
+		{
+			if (regexp.test(char))
+			{
+				return char
+			}
+			else
+			{
+				return Nothing(reader, { message: 'Char: no char at' })
+			}
+		})
+	}
+}
+
 export function Charclass (charclass: string): $Matcher
 {
 	return (reader) =>

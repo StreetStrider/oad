@@ -43,6 +43,43 @@ export function traverse (tree: any, mapper: (match: any) => any): any
 }
 
 
+export const Nothing: unique symbol = Symbol('Nothing')
+
+export function find (tree: any, pred: (match: any) => any): any
+{
+	if (pred(tree))
+	{
+		return tree
+	}
+	else if (is_array(tree))
+	{
+		for (var subtree of tree)
+		{
+			var found = find(subtree, pred)
+
+			if (found !== Nothing)
+			{
+				return found
+			}
+		}
+	}
+	else if (is_object(tree))
+	{
+		for (var key in tree)
+		{
+			var found = find(tree[key], pred)
+
+			if (found !== Nothing)
+			{
+				return found
+			}
+		}
+	}
+
+	return Nothing
+}
+
+
 export function when (pred: (match: any) => boolean, mapper: (match: any) => any)
 {
 	return (value: any) =>
@@ -61,7 +98,7 @@ export function when (pred: (match: any) => boolean, mapper: (match: any) => any
 
 export function trim ()
 {
-	return when((match: any) =>
+	return when((match) =>
 	{
 		if (match == null) return true
 		if ((typeof match === 'string') && (match[0] !== '@')) return true
@@ -71,7 +108,7 @@ export function trim ()
 }
 
 
-export function flatten ()
+export function pluck ()
 {
 	return when((match) =>
 	{
@@ -81,6 +118,38 @@ export function flatten ()
 	},
 	(match) => match[0])
 }
+
+
+export function flatten ()
+{
+	return (match: any) =>
+	{
+		if (is_array(match))
+		{
+			return [].concat(...match)
+		}
+		return match
+	}
+}
+
+
+export function by_token (token: any)
+{
+	return (match: any) =>
+	{
+		return (match?.token === token)
+	}
+}
+
+
+var found = Symbol('found')
+
+function Found (value: any)
+{
+	return { value, found }
+}
+
+Found.is = (value: any) => (found in Object(value))
 
 
 function is_object (value: any): value is Object

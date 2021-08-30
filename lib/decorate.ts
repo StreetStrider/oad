@@ -11,6 +11,8 @@ import { Matched, Nothing } from './match'
 
 import { $Matcher } from './matcher'
 
+import { traverse } from './traverse'
+
 
 export function Name (name: string)
 {
@@ -26,18 +28,6 @@ export function Name (name: string)
 		def(fn, 'name', d)
 
 		return fn
-	}
-}
-
-
-export function Translate <T, R> (fn: (match: T) => R)
-{
-	return function (matcher: $Matcher<T>): $Matcher<R>
-	{
-		return (reader) =>
-		{
-			return matcher(reader).map(fn)
-		}
 	}
 }
 
@@ -67,4 +57,25 @@ export function Literize (token: string)
 	{
 		return { token }
 	}
+}
+
+
+export function Translate <T, R> (fn: (match: T) => R)
+{
+	return function (matcher: $Matcher<T>): $Matcher<R>
+	{
+		return (reader) =>
+		{
+			return matcher(reader).map(fn)
+		}
+	}
+}
+
+
+export function Traverse (mapper: (match: any) => any)
+{
+	return Translate(match =>
+	{
+		return traverse(match, mapper)
+	})
 }

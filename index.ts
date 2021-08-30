@@ -24,11 +24,14 @@ import { Literize } from './lib/decorate'
 import { traverse } from './lib/traverse'
 // import { Reduce } from './lib/traverse'
 import { trim } from './lib/traverse'
-import { flatten } from './lib/traverse'
+import { pluck } from './lib/traverse'
+// import { flatten } from './lib/traverse'
+
+import { number } from './lib/lisp/parser'
 
 var space = Charclass('\\s')
 var plus = pipe.now(Literal('+'), Literize('@plus'))
-var number = pipe.now(Charclass('\\d'), Translate(Number), Tokenize('@number'))
+// var number = pipe.now(Charclass('\\d'), Translate(Number), Tokenize('@number'))
 var sep = Literal(';')
 
 
@@ -51,22 +54,26 @@ var program = Total(Repeat(Spaced(expr), sep))
 expr_portal.onto = expr
 
 // var r = Reader(`123  +   345`)
-var r = Reader(`123  + / 345 ; 100   +100;`)
+// var r = Reader(`123  + / 345 ; 100   +100;`)
+var r = Reader(`-123,444.555,3`)
 
-var P = program(r)
+var Rs =
+[
+	Reader('+0'),
+	Reader('-0'),
+	Reader('-110'),
+	Reader('.5,55'),
+	Reader('-.777,77'),
+	Reader('222,2'),
+	Reader(`-123,444.555,3`),
+	Reader('1' + '0'.repeat(308)),
+	Reader('1' + '0'.repeat(309)),
+]
 
-console.info(P.reader.repr())
-console.dir(P.repr(), { depth: Infinity })
-
-if (! P.is_nothing)
+for (var r of Rs)
 {
-	// var t = traverse(P.match, mapper)
-	var t = traverse(P.match, pipe(trim(), flatten()))
-	console.dir(t, { depth: Infinity })
-}
+	var P = number(r)
 
-function mapper (match: any)
-{
-	console.warn(match)
-	return match
+	console.info(P.reader.repr())
+	console.dir(P.repr(), { depth: Infinity })
 }
